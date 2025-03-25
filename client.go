@@ -50,7 +50,7 @@ func (c *Client) sendJSONRequest(req *http.Request, res interface{}) error {
 		return err
 	}
 	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated && resp.StatusCode != http.StatusAccepted {
 		bodyBytes, _ := io.ReadAll(resp.Body)
 		return fmt.Errorf("HTTP response StatusCode: %d, Body: %s ", resp.StatusCode, string(bodyBytes))
 	}

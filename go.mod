@@ -1,3 +1,3 @@
-module github.com/nisainan/dify-sdk-go
+module github.com/WenWuZhiDao/dify-sdk-go
 
 go 1.18

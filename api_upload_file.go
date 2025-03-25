@@ -1,14 +1,14 @@
 package dify
 
 import (
-	"bytes"
 	"context"
+	"fmt"
 	"net/http"
 )
 
 type UploadFileRequest struct {
-	User  string       `form:"user"`
-	Files bytes.Buffer `form:"files"`
+	User     string `json:"user"`
+	FilePath string `json:"filePath"`
 }
 
 type UploadFileResponse struct {
@@ -26,10 +26,14 @@ type UploadFileResponse struct {
  */
 func (api *API) UploadFile(ctx context.Context, req *UploadFileRequest) (resp *UploadFileResponse, err error) {
 
-	httpReq, err := api.createBaseRequest(ctx, http.MethodPost, "/files/upload", req, Chat)
+	httpReq, err := api.CreateFormFileRequest(ctx, http.MethodPost, "/files/upload", req, Chat)
 	if err != nil {
 		return
 	}
 	err = api.c.sendJSONRequest(httpReq, &resp)
+	if err != nil {
+		fmt.Printf("Failed to read response: %v\n", err)
+		return nil, err
+	}
 	return
 }

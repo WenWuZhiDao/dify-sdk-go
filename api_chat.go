@@ -6,12 +6,12 @@ import (
 )
 
 type ChatMessageRequest struct {
-	Inputs         map[string]interface{} `json:"inputs"`
-	Query          string                 `json:"query"`
-	ResponseMode   string                 `json:"response_mode"`
-	ConversationID string                 `json:"conversation_id,omitempty"`
-	User           string                 `json:"user"`
-	Files          string                 `json:"files"`
+	Inputs         map[string]interface{}   `json:"inputs"`
+	Query          string                   `json:"query"`
+	ResponseMode   string                   `json:"response_mode"`
+	ConversationID string                   `json:"conversation_id,omitempty"`
+	User           string                   `json:"user"`
+	Files          []*ChatMessageFilesParam `json:"files"`
 }
 
 type ChatMessageResponse struct {
@@ -33,4 +33,11 @@ func (api *API) ChatMessages(ctx context.Context, req *ChatMessageRequest) (resp
 	}
 	err = api.c.sendJSONRequest(httpReq, &resp)
 	return
+}
+
+type ChatMessageFilesParam struct {
+	Type           string `json:"type"`
+	TransferMethod string `json:"transfer_method"`
+	Url            string `json:"url,omitempty"`
+	UploadFileId   string `josn:"upload_file_id"`
 }

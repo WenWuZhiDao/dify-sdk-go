@@ -11,6 +11,7 @@ type ChatMessageRequest struct {
 	ResponseMode   string                 `json:"response_mode"`
 	ConversationID string                 `json:"conversation_id,omitempty"`
 	User           string                 `json:"user"`
+	Files          string                 `json:"files"`
 }
 
 type ChatMessageResponse struct {

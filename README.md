@@ -17,7 +17,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/nisainan/dify-sdk-go"
+	"github.com/WenWuZhiDao/dify-sdk-go"
 )
 
 func main() {

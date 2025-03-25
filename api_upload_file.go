@@ -26,7 +26,7 @@ type UploadFileResponse struct {
  */
 func (api *API) UploadFile(ctx context.Context, req *UploadFileRequest) (resp *UploadFileResponse, err error) {
 
-	httpReq, err := api.CreateFormFileRequest(ctx, http.MethodPost, "/files/upload", req, Chat)
+	httpReq, err := api.CreateFormFileRequest(ctx, http.MethodPost, "/v1/files/upload", req, Chat)
 	if err != nil {
 		return
 	}

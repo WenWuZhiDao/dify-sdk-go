@@ -39,5 +39,5 @@ type ChatMessageFilesParam struct {
 	Type           string `json:"type"`
 	TransferMethod string `json:"transfer_method"`
 	Url            string `json:"url,omitempty"`
-	UploadFileId   string `josn:"upload_file_id"`
+	UploadFileId   string `json:"upload_file_id"`
 }

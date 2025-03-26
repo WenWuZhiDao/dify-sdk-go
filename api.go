@@ -58,6 +58,7 @@ func (api *API) createBaseRequest(ctx context.Context, method, apiUrl string, bo
 			if err != nil {
 				return nil, err
 			}
+			fmt.Printf("CreateBaseRequest body: %s", string(reqBytes))
 			b = bytes.NewBuffer(reqBytes)
 		}
 	} else {

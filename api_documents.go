@@ -119,6 +119,115 @@ func (api *API) DocumentCreateByText(ctx context.Context, req *DocumentCreateByT
 
 // ------------------------------
 
+type DatasetSegmentsDataResponse struct {
+	ID            string   `json:"id"`
+	Position      int      `json:"position"`
+	DocumentId    string   `json:"document_id"`
+	Keywords      []string `json:"keywords"`
+	Content       string   `json:"content"`
+	Answer        string   `json:"answer"`
+	WordCount     int      `json:"word_count"`
+	Tokens        int      `json:"tokens"`
+	IndexNodeId   string   `json:"index_node_id"`
+	IndexNodeHash string   `json:"index_node_hash"`
+	HitCount      int      `json:"hit_count"`
+	Enabled       bool     `json:"enabled"`
+	DisabledAt    any      `json:"disabled_at"`
+	DisabledBy    any      `json:"disabled_by"`
+	Status        string   `json:"status"`
+	CreatedBy     string   `json:"created_by"`
+	CreatedAt     int      `json:"created_at"`
+	IndexingAt    int      `json:"indexing_at"`
+	CompletedAt   int      `json:"completed_at"`
+	Error         any      `json:"error"`
+	StoppedAt     any      `json:"stopped_at"`
+}
+
+type GetSegmentsByDocumentIdResponse struct {
+	Data    []DatasetSegmentsDataResponse `json:"data"`
+	DocForm string                        `json:"doc_form"`
+}
+
+type GetSegmentsByDocumentIdRequest struct {
+	DatasetID  string `json:"dataset_id"`
+	DocumentId string `json:"document_id"`
+	Keyword    string `json:"keyword"`
+	Status     string `json:"status"`
+}
+
+func (api *API) GetSegmentsByDocumentId(ctx context.Context, req *GetSegmentsByDocumentIdRequest) (resp *GetSegmentsByDocumentIdResponse, err error) {
+	httpReq, err := api.createBaseRequest(ctx, http.MethodGet, fmt.Sprintf("/v1/datasets/%s/document/%s/segments", req.DatasetID, req.DocumentId), req, Dataset)
+	if err != nil {
+		return
+	}
+	err = api.c.sendJSONRequest(httpReq, &resp)
+	return
+}
+
+// ------------------------------
+type AddDocumentSegmentsSegmentsRequest struct {
+	Content  string   `json:"content"`
+	Answer   string   `json:"answer"`
+	Keywords []string `json:"keywords"`
+}
+type AddDocumentSegmentsRequest struct {
+	DatasetID  string                               `json:"dataset_id"`
+	DocumentId string                               `json:"document_id"`
+	Segments   []AddDocumentSegmentsSegmentsRequest `json:"segments"`
+}
+
+type AddDocumentSegmentsResponse struct {
+	Data    []DatasetSegmentsDataResponse `json:"data"`
+	DocForm string                        `json:"doc_form"`
+}
+
+func (api *API) AddSegmentsToDocument(ctx context.Context, req *AddDocumentSegmentsRequest) (resp *AddDocumentSegmentsResponse, err error) {
+	httpReq, err := api.createBaseRequest(ctx, http.MethodPost, fmt.Sprintf("/v1/datasets/%s/document/%s/segments", req.DatasetID, req.DocumentId), req, Dataset)
+	if err != nil {
+		return
+	}
+	err = api.c.sendJSONRequest(httpReq, &resp)
+	return
+}
+
+// ------------------------------
+
+type DeleteSegmentsRequest struct {
+	DatasetID  string `json:"dataset_id"`
+	DocumentId string `json:"document_id"`
+	SegmentId  string `json:"segment_id"`
+}
+
+type DeleteResponse struct {
+	Result string `json:"result"`
+}
+
+func (api *API) DeleteDatasetSegments(ctx context.Context, req *DeleteSegmentsRequest) (resp *DeleteResponse, err error) {
+	httpReq, err := api.createBaseRequest(ctx, http.MethodDelete, fmt.Sprintf("/v1/datasets/%s/document/%s/segments/%s", req.DatasetID, req.DocumentId, req.SegmentId), nil, Dataset)
+	if err != nil {
+		return
+	}
+	err = api.c.sendJSONRequest(httpReq, &resp)
+	return
+}
+
+// ------------------------------
+type DeleteDocumentRequest struct {
+	DatasetID  string `json:"dataset_id"`
+	DocumentId string `json:"document_id"`
+}
+
+func (api *API) DeleteDatasetDocument(ctx context.Context, req *DeleteDocumentRequest) (resp *DeleteResponse, err error) {
+	httpReq, err := api.createBaseRequest(ctx, http.MethodDelete, fmt.Sprintf("/v1/datasets/%s/document/%s", req.DatasetID, req.DocumentId), nil, Dataset)
+	if err != nil {
+		return
+	}
+	err = api.c.sendJSONRequest(httpReq, &resp)
+	return
+}
+
+// ------------------------------
+
 type DocumentUpdateByTextRequest struct {
 	DocumentCreateByTextRequest
 	DocumentID string `json:"document_id"`

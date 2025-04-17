@@ -156,7 +156,7 @@ type GetSegmentsByDocumentIdRequest struct {
 }
 
 func (api *API) GetSegmentsByDocumentId(ctx context.Context, req *GetSegmentsByDocumentIdRequest) (resp *GetSegmentsByDocumentIdResponse, err error) {
-	httpReq, err := api.createBaseRequest(ctx, http.MethodGet, fmt.Sprintf("/v1/datasets/%s/document/%s/segments", req.DatasetID, req.DocumentId), req, Dataset)
+	httpReq, err := api.createBaseRequest(ctx, http.MethodGet, fmt.Sprintf("/v1/datasets/%s/documents/%s/segments", req.DatasetID, req.DocumentId), req, Dataset)
 	if err != nil {
 		return
 	}
@@ -182,7 +182,7 @@ type AddDocumentSegmentsResponse struct {
 }
 
 func (api *API) AddSegmentsToDocument(ctx context.Context, req *AddDocumentSegmentsRequest) (resp *AddDocumentSegmentsResponse, err error) {
-	httpReq, err := api.createBaseRequest(ctx, http.MethodPost, fmt.Sprintf("/v1/datasets/%s/document/%s/segments", req.DatasetID, req.DocumentId), req, Dataset)
+	httpReq, err := api.createBaseRequest(ctx, http.MethodPost, fmt.Sprintf("/v1/datasets/%s/documents/%s/segments", req.DatasetID, req.DocumentId), req, Dataset)
 	if err != nil {
 		return
 	}
@@ -203,7 +203,7 @@ type DeleteResponse struct {
 }
 
 func (api *API) DeleteDatasetSegments(ctx context.Context, req *DeleteSegmentsRequest) (resp *DeleteResponse, err error) {
-	httpReq, err := api.createBaseRequest(ctx, http.MethodDelete, fmt.Sprintf("/v1/datasets/%s/document/%s/segments/%s", req.DatasetID, req.DocumentId, req.SegmentId), nil, Dataset)
+	httpReq, err := api.createBaseRequest(ctx, http.MethodDelete, fmt.Sprintf("/v1/datasets/%s/documents/%s/segments/%s", req.DatasetID, req.DocumentId, req.SegmentId), nil, Dataset)
 	if err != nil {
 		return
 	}
@@ -218,7 +218,7 @@ type DeleteDocumentRequest struct {
 }
 
 func (api *API) DeleteDatasetDocument(ctx context.Context, req *DeleteDocumentRequest) (resp *DeleteResponse, err error) {
-	httpReq, err := api.createBaseRequest(ctx, http.MethodDelete, fmt.Sprintf("/v1/datasets/%s/document/%s", req.DatasetID, req.DocumentId), nil, Dataset)
+	httpReq, err := api.createBaseRequest(ctx, http.MethodDelete, fmt.Sprintf("/v1/datasets/%s/documents/%s", req.DatasetID, req.DocumentId), nil, Dataset)
 	if err != nil {
 		return
 	}

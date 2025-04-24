@@ -9,6 +9,8 @@ import (
 	"mime/multipart"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 type DocumentsRequest struct {
@@ -371,5 +373,62 @@ func (api *API) DocumentDelete(ctx context.Context, req *DocumentDeleteRequest) 
 		return
 	}
 	err = api.c.sendJSONRequest(httpReq, &resp)
+	return
+}
+
+type DocumentDownloadUrlResopnse struct {
+	Id          string `json:"id"`
+	Name        string `json:"name"`
+	Extension   string `json:"extension"`
+	DownloadUrl string `json:"download_url"`
+	MimeType    string `json:"mime_type"`
+	Url         string `json:"url"`
+	CreatedBy   string `json:"created_by"`
+	CreatedAt   any    `json:"created_at"`
+	Size        uint64 `json:"size"`
+}
+
+type DocumentByIdRequest struct {
+	DatasetID  string `json:"dataset_id"`
+	DocumentID string `json:"document_id"`
+}
+
+func (api *API) GetDocumentDownloadUrl(ctx context.Context, req *DocumentByIdRequest) (resp *DocumentDownloadUrlResopnse, err error) {
+	httpReq, err := api.createBaseRequest(ctx, http.MethodGet, fmt.Sprintf("/v1/datasets/%s/documents/%s/upload-file", req.DatasetID, req.DocumentID), nil, Dataset)
+	if err != nil {
+		return
+	}
+	err = api.c.sendJSONRequest(httpReq, &resp)
+	return
+}
+
+func (api *API) DocumentDownloadFile(c *gin.Context, req *DocumentByIdRequest) (err error) {
+	downloadUrl, err := api.GetDocumentDownloadUrl(c.Request.Context(), req)
+	httpReq, err := api.createBaseRequest(c.Request.Context(), http.MethodGet, downloadUrl.Url, nil, Dataset)
+	if err != nil {
+		return
+	}
+	resp, err := api.c.sendRequest(httpReq)
+	// 检查响应状态码
+	if resp.StatusCode != http.StatusOK {
+		c.AbortWithStatusJSON(resp.StatusCode, gin.H{
+			"error": fmt.Sprintf("DocumentDownloadUrl error: %s", resp.Status),
+		})
+		return
+	}
+	// 设置响应头
+	c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", downloadUrl.Name))
+	c.Header("Content-Type", resp.Header.Get("Content-Type"))
+	if contentLength := resp.Header.Get("Content-Length"); contentLength != "" {
+		c.Header("Content-Length", contentLength)
+	}
+
+	// 流式传输（推荐直接传输二进制）
+	_, err = io.Copy(c.Writer, resp.Body)
+	if err != nil {
+		// 记录日志但不再返回响应（可能已经发送了部分数据）
+		fmt.Printf("文件传输中断: %v\n", err)
+	}
+	defer resp.Body.Close()
 	return
 }

@@ -250,6 +250,57 @@ func (api *API) DocumentUpdateByText(ctx context.Context, req *DocumentUpdateByT
 
 // ------------------------------
 
+type DocumentUpdateByFileRequest struct {
+	DatasetID  string         `json:"dataset_id"`
+	DocumentID string         `json:"document_id"`
+	File       multipart.File `json:"file"`
+	FileName   string         `json:"file_name"`
+	Data       struct {
+		OriginalDocumentID string      `json:"original_document_id,omitempty"`
+		IndexingTechnique  string      `json:"indexing_technique,omitempty"`
+		ProcessRule        ProcessRule `json:"process_rule"`
+	} `json:"data"`
+}
+type DocumentUpdateByFileResponse struct {
+	DocumentCreateByFileResponse
+}
+
+func (api *API) DocumentUpdateByFile(ctx context.Context, req *DocumentUpdateByFileRequest) (resp *DocumentUpdateByFileResponse, err error) {
+
+	reqData, err := json.Marshal(req.Data)
+	if err != nil {
+		return nil, fmt.Errorf("error json.Marshal form data: %v", err)
+	}
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+	part, err := writer.CreateFormFile("file", req.FileName)
+	if err != nil {
+		return nil, fmt.Errorf("error creating form file: %v", err)
+	}
+	_, err = io.Copy(part, req.File)
+	if err != nil {
+		return nil, fmt.Errorf("error copying file: %v", err)
+	}
+	err = writer.WriteField("data", string(reqData))
+	if err != nil {
+		return nil, fmt.Errorf("error writer.WriteField: %v", err)
+	}
+	err = writer.Close()
+	if err != nil {
+		return nil, fmt.Errorf("error closing writer: %v", err)
+	}
+	httpReq, err := api.createBaseRequest(ctx, http.MethodPost, fmt.Sprintf("/v1/datasets/%s/documents/%s/update_by_file", req.DatasetID, req.DocumentID), body, Dataset)
+	if err != nil {
+		return
+	}
+	httpReq.Header.Set("Content-Type", writer.FormDataContentType())
+	err = api.c.sendJSONRequest(httpReq, &resp)
+	return
+
+}
+
+// ------------------------------
+
 type DocumentCreateByFileRequest struct {
 	DatasetID string         `json:"dataset_id"`
 	File      multipart.File `json:"file"`

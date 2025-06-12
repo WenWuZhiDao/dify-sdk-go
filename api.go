@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/textproto"
 	"os"
+	"path/filepath"
 )
 
 const (
@@ -98,8 +99,8 @@ func (api *API) CreateFormFileRequest(ctx context.Context, method, apiUrl string
 
 	// 3. 创建 multipart part 的 header
 	partHeader := make(textproto.MIMEHeader)
-	partHeader.Set("Content-Type", params.FileType)                 // 设置文件类型
-	partHeader.Set("Content-Disposition", `form-data; name="file"`) // 设置字段名和文件名
+	partHeader.Set("Content-Type", params.FileType)                                                                             // 设置文件类型
+	partHeader.Set("Content-Disposition", fmt.Sprintf(`form-data; name="file"; filename="%s"`, filepath.Base(params.FilePath))) // 设置字段名和文件名
 
 	// 4. 创建 part 并写入文件内容
 	partWriter, err := writer.CreatePart(partHeader)
@@ -114,9 +115,6 @@ func (api *API) CreateFormFileRequest(ctx context.Context, method, apiUrl string
 
 	// 添加用户标识字段
 	writer.WriteField("user", params.User)
-	if params.FileType != "" {
-		writer.WriteField("type", params.FileType)
-	}
 
 	// 关闭 writer
 	writer.Close()

@@ -9,6 +9,7 @@ import (
 type UploadFileRequest struct {
 	User     string `json:"user"`
 	FilePath string `json:"filePath"`
+	FileType string `json:"fileType"`
 }
 
 type UploadFileResponse struct {

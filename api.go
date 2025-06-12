@@ -98,6 +98,9 @@ func (api *API) CreateFormFileRequest(ctx context.Context, method, apiUrl string
 
 	// 添加文件字段
 	part, err := writer.CreateFormFile("file", filepath.Base(params.FilePath))
+	if params.FileType != "" {
+		writer.WriteField("type", params.FileType)
+	}
 	if err != nil {
 		fmt.Printf("Failed to create form file: %v\n", err)
 		return nil, err

@@ -8,8 +8,8 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
+	"net/textproto"
 	"os"
-	"path/filepath"
 )
 
 const (
@@ -96,17 +96,18 @@ func (api *API) CreateFormFileRequest(ctx context.Context, method, apiUrl string
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 
-	// 添加文件字段
-	part, err := writer.CreateFormFile("file", filepath.Base(params.FilePath))
+	// 3. 创建 multipart part 的 header
+	partHeader := make(textproto.MIMEHeader)
+	partHeader.Set("Content-Type", params.FileType)                 // 设置文件类型
+	partHeader.Set("Content-Disposition", `form-data; name="file"`) // 设置字段名和文件名
 
+	// 4. 创建 part 并写入文件内容
+	partWriter, err := writer.CreatePart(partHeader)
 	if err != nil {
-		fmt.Printf("Failed to create form file: %v\n", err)
-		return nil, err
+		panic(err)
 	}
 
-	// 将文件内容写入表单
-	_, err = io.Copy(part, file)
-	if err != nil {
+	if _, err := io.Copy(partWriter, file); err != nil {
 		fmt.Printf("Failed to copy file to form: %v\n", err)
 		return nil, err
 	}

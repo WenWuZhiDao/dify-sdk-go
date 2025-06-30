@@ -12,6 +12,9 @@ type ChatMessageRequest struct {
 	ConversationID string                   `json:"conversation_id,omitempty"`
 	User           string                   `json:"user"`
 	Files          []*ChatMessageFilesParam `json:"files"`
+	Notary         string                   `json:"notary"`       // 公证员
+	NotaryOffice   string                   `json:"notaryOffice"` //公证处名
+	Applicant      string                   `json:"applicant"`    //申请人姓名
 }
 
 type ChatMessageResponse struct {
